@@ -1,40 +1,61 @@
-import React, { useState } from 'react';    
-import styled, { createGlobalStyle } from 'styled-components';    
-import {    
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, Legend,    
-  ResponsiveContainer, ComposedChart,    
-} from 'recharts';    
-import { FaRobot, FaPhone, FaChartLine, FaCog, FaInfoCircle } from 'react-icons/fa';  
-
+// App.jsx  
+  
+import React, { useState } from 'react';  
+import styled, { createGlobalStyle } from 'styled-components';  
+import {  
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, Legend,  
+  ResponsiveContainer, ComposedChart,  
+} from 'recharts';  
+import { FaRobot, FaPhone, FaChartLine, FaCog, FaInfoCircle, FaPlus, FaEquals, FaTimes } from 'react-icons/fa';  
   
 /* Global Styles */  
-const GlobalStyle = createGlobalStyle`    
+const GlobalStyle = createGlobalStyle`  
   *, *::before, *::after {  
-    box-sizing: border-box;    
+    box-sizing: border-box;  
   }  
   
-  body {    
-    background-color: #f0f4f8;    
-    margin: 0;    
-    padding: 0;    
-  }    
-`; 
+  body {  
+    background-color: #f0f4f8;  
+    margin: 0;  
+    padding: 0;  
+  }  
+`;  
   
 /* Styled Components */  
-const AppContainer = styled.div`    
-  font-family: Arial, sans-serif;    
-  width: 100%;    
-  max-width: 1200px;    
-  margin: 0 auto;    
-  padding: 0 5%;              
-  background-color: #f0f4f8;    
-  color: #333;    
-  min-height: 100vh;    
-  display: flex;    
-  flex-direction: column;    
-  align-items: center;
-  justify-content: center; 
-`;   
+const AppContainer = styled.div`  
+  font-family: Arial, sans-serif;  
+  width: 90vw;  
+  margin: 0 auto;  
+  padding: 5vw 5vw;  
+  background-color: #f0f4f8;  
+  color: #333;  
+  min-height: 100vh;  
+  display: flex;  
+  flex-direction: column;  
+`;  
+  
+const Headline = styled.div`  
+  width: 100%;  
+  text-align: center;  
+  margin-bottom: 20px;  
+`;  
+  
+const MainContent = styled.div`  
+  display: flex;  
+  flex-direction: row;  
+  width: 100%;  
+  gap: 20px;  
+  
+  @media (max-width: 1024px) {  
+    flex-direction: column;  
+  }  
+`;  
+  
+const Column = styled.div`  
+  flex: 1;  
+  min-width: 0; // Prevents flex items from overflowing  
+  width: 100%; // Ensures the column takes full width in mobile view  
+`;  
   
 const Card = styled.div`  
   background-color: white;  
@@ -42,24 +63,14 @@ const Card = styled.div`
   padding: 20px;  
   margin-bottom: 20px;  
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);  
-  max-width: 800px; 
-  width: 100%;
-`;   
+  width: 100%;  
+  height: 100%; // Makes the card take full height of its container  
+`;  
   
 const CardTitle = styled.h2`  
   font-size: 24px;  
   margin-bottom: 20px;  
   color: #2c3e50;  
-`;  
-  
-const Grid = styled.div`  
-  display: grid;  
-  grid-template-columns: 1fr 1fr;  
-  gap: 20px;  
-  
-  @media (max-width: 768px) {  
-    grid-template-columns: 1fr;  
-  }  
 `;  
   
 const Label = styled.label`  
@@ -97,32 +108,38 @@ const Slider = styled.input.attrs({ type: 'range' })`
   
 const ChartContainer = styled.div`  
   margin-top: 20px;  
+  width: 100%;  
+  height: 400px; // Set a fixed height for the chart  
 `;  
   
 const CostDisplay = styled.div`  
-  display: grid;  
-  grid-template-columns: repeat(3, 1fr);  
-  gap: 20px;  
+  display: flex;  
+  flex-wrap: wrap;  
+  justify-content: center;  
+  align-items: center;  
+  gap: 10px;  
   margin-top: 20px;  
-  text-align: center;  
 `;  
   
 const CostItem = styled.div`  
   background-color: #ecf0f1;  
   padding: 15px;  
   border-radius: 8px;  
+  text-align: center;  
 `;  
   
 const CostLabel = styled.div`  
   font-size: 14px;  
   color: #7f8c8d;  
-  margin-bottom: 5px;  
+  margin-top: 5px;  
+  text-align: center;  
 `;  
   
 const CostValue = styled.div`  
   font-size: 24px;  
   font-weight: bold;  
   color: #2980b9;  
+  text-align: center;  
 `;  
   
 const ExplanationBox = styled.div`  
@@ -133,84 +150,83 @@ const ExplanationBox = styled.div`
   margin-top: 20px;  
 `;  
   
-const SectionTitle = styled.h3`    
-  font-size: 20px;    
-  margin-top: 20px;    
-  margin-bottom: 10px;    
-  color: #2c3e50;    
+const SectionTitle = styled.h3`  
+  font-size: 20px;  
+  margin-top: 20px;  
+  margin-bottom: 10px;  
+  color: #2c3e50;  
 `;  
   
-const InstructionsBox = styled.div`    
-  background-color: #e8f4fd;    
-  border-left: 5px solid #3498db;    
-  padding: 15px;    
-  margin-bottom: 20px;    
-  border-radius: 4px;    
+const InstructionsBox = styled.div`  
+  background-color: #e8f4fd;  
+  border-left: 5px solid #3498db;  
+  padding: 15px;  
+  margin-bottom: 20px;  
+  border-radius: 4px;  
 `;  
   
 /* Constants */  
-const models = [    
-  { name: "GPT-4o Global Deployment", input: 5, output: 15, ptu: true, ptuPrice: 2 },    
-  { name: "GPT-4o Regional API", input: 5, output: 15, ptu: true, ptuPrice: 2 },    
-  { name: "GPT-4o-mini Global Deployment", input: 0.15, output: 0.60, ptu: true, ptuPrice: 2 },    
-  { name: "GPT-4o-mini Regional API", input: 0.165, output: 0.66, ptu: true, ptuPrice: 2 },    
+const models = [  
+  { name: "GPT-4o Global Deployment", input: 5, output: 15, ptu: true, ptuPrice: 2 },  
+  { name: "GPT-4o Regional API", input: 5, output: 15, ptu: true, ptuPrice: 2 },  
+  { name: "GPT-4o-mini Global Deployment", input: 0.15, output: 0.60, ptu: true, ptuPrice: 2 },  
+  { name: "GPT-4o-mini Regional API", input: 0.165, output: 0.66, ptu: true, ptuPrice: 2 },  
 ];  
   
-const speechModels = [    
-  { name: "Whisper", price: 0 },    
-  { name: "TTS (Text to Speech)", price: 15 },    
-  { name: "TTS HD", price: 30 },    
+const speechModels = [  
+  { name: "Whisper", price: 0 },  
+  { name: "TTS (Text to Speech)", price: 15 },  
+  { name: "TTS HD", price: 30 },  
 ];  
   
 /* Updated Distribution Patterns with clearer names */  
-const callDistributionPatterns = {    
-  uniform: "Uniform Call Volume",    
-  normalBusiness: "Peak During Business Hours",    
-  nightShift: "Peak During Night Hours",    
-  heavyMorning: "Heavy Morning Calls",    
-  heavyEvening: "Heavy Evening Calls",    
+const callDistributionPatterns = {  
+  uniform: "Uniform Call Volume",  
+  normalBusiness: "Peak During Business Hours",  
+  nightShift: "Peak During Night Hours",  
+  heavyMorning: "Heavy Morning Calls",  
+  heavyEvening: "Heavy Evening Calls",  
 };  
   
-const durationDistributionPatterns = {    
-  uniform: "Consistent Call Duration",    
-  shorterPeak: "Shorter During Peak Hours",    
-  longerPeak: "Longer During Peak Hours",    
-  variable: "Variable Call Duration",    
+const durationDistributionPatterns = {  
+  uniform: "Consistent Call Duration",  
+  shorterPeak: "Shorter During Peak Hours",  
+  longerPeak: "Longer During Peak Hours",  
+  variable: "Variable Call Duration",  
 };  
   
-const taskTypes = {    
-  summarization: "Call Summarization",    
-  sentiment: "Sentiment Analysis",    
-  realTimeSentiment: "Real-time Sentiment Analysis",    
-  complexAnalysis: "Complex Analysis (Summary + Sentiment)",    
+const taskTypes = {  
+  summarization: "Call Summarization",  
+  sentiment: "Sentiment Analysis",  
+  realTimeSentiment: "Real-time Sentiment Analysis",  
+  complexAnalysis: "Complex Analysis (Summary + Sentiment)",  
 };  
   
-/* Instructions Component */  
 /* Instructions Component */  
 const Instructions = () => (  
   <InstructionsBox>  
-    <h3>How to Use the Call Center Simulator:</h3>  
+    <h3>How to Use the Call Center Cost Estimator:</h3>  
     <ol>  
       <li>  
-      <FaRobot /><strong> Select AI Models:</strong> Choose the AI models for call handling and speech recognition you'd like to simulate.  
+        <FaRobot /><strong> Select AI Models:</strong> Choose the AI models for call handling and speech recognition you'd like to simulate.  
       </li>  
       <li>  
-      <FaPhone /><strong> Enter Call Details:</strong> Input the total number of calls your center handles each day and the average length of each call.  
+        <FaPhone /><strong> Enter Call Details:</strong> Input the total number of calls your center handles each day and the average length of each call.  
       </li>  
       <li>  
-      <FaPhone /><strong> Choose Call Patterns:</strong> Select how your call volume and call durations change throughout the day.  
+        <FaPhone /><strong> Choose Call Patterns:</strong> Select how your call volume and call durations change throughout the day.  
       </li>  
       <li>  
-      <FaPhone /><strong> Adjust Peak Times:</strong> Modify settings to simulate busy periods and different customer calling behaviors.  
+        <FaPhone /><strong> Adjust Peak Times:</strong> Modify settings to simulate busy periods and different customer calling behaviors.  
       </li>  
       <li>  
-      <FaPhone /><strong> Set Call Complexity:</strong> Specify any additional information or context you'd like each call to include.  
+        <FaPhone /><strong> Set Call Complexity:</strong> Specify any additional information or context you'd like each call to include.  
       </li>  
       <li>  
-      <FaCog/> <strong> Select Analysis Type:</strong> Choose the kind of analysis you want the simulator to perform on the calls.  
+        <FaCog/> <strong> Select Analysis Type:</strong> Choose the kind of analysis you want the estimator to perform on the calls.  
       </li>  
       <li>  
-      <FaInfoCircle /><strong> Configure Real-Time Settings:</strong> If you want real-time analysis, set how frequently you'd like the analysis to run.  
+        <FaInfoCircle /><strong> Configure Real-Time Settings:</strong> If you want real-time analysis, set how frequently you'd like the analysis to run.  
       </li>  
       <li>  
         <FaChartLine /><strong> Review Results:</strong> View the visualizations and cost summary to see how your settings impact the simulation.  
@@ -218,7 +234,6 @@ const Instructions = () => (
     </ol>  
   </InstructionsBox>  
 );  
-
   
 /* InputForm Component */  
 const InputForm = ({  
@@ -238,128 +253,220 @@ const InputForm = ({
 }) => (  
   <Card>  
     <CardTitle>Configure Simulation Parameters</CardTitle>  
-    <Grid>  
-      <div>  
-        <SectionTitle>Model Selection</SectionTitle>  
-        <Label>Model</Label>  
-        <Select  
-          value={selectedModel.name}  
-          onChange={(e) => setSelectedModel(models.find(m => m.name === e.target.value))}  
-        >  
-          {models.map((model) => (  
-            <option key={model.name} value={model.name}>{model.name}</option>  
-          ))}  
-        </Select>  
+    <div>  
+      <SectionTitle>Model Selection</SectionTitle>  
+      <Label>Model</Label>  
+      <Select  
+        value={selectedModel.name}  
+        onChange={(e) => setSelectedModel(models.find(m => m.name === e.target.value))}  
+      >  
+        {models.map((model) => (  
+          <option key={model.name} value={model.name}>{model.name}</option>  
+        ))}  
+      </Select>  
   
-        <Label>Speech Model</Label>  
-        <Select  
-          value={selectedSpeechModel.name}  
-          onChange={(e) => setSelectedSpeechModel(speechModels.find(m => m.name === e.target.value))}  
-        >  
-          {speechModels.map((model) => (  
-            <option key={model.name} value={model.name}>{model.name}</option>  
-          ))}  
-        </Select>  
+      <Label>Speech Model</Label>  
+      <Select  
+        value={selectedSpeechModel.name}  
+        onChange={(e) => setSelectedSpeechModel(speechModels.find(m => m.name === e.target.value))}  
+      >  
+        {speechModels.map((model) => (  
+          <option key={model.name} value={model.name}>{model.name}</option>  
+        ))}  
+      </Select>  
   
-        <SectionTitle>Call Settings</SectionTitle>  
+      <SectionTitle>Call Settings</SectionTitle>  
   
-        <Label>Total Daily Calls</Label>  
-        <Input type="number" value={totalCalls} onChange={(e) => setTotalCalls(Number(e.target.value))} />  
+      <Label>Total Daily Calls</Label>  
+      <Input type="number" value={totalCalls} onChange={(e) => setTotalCalls(Number(e.target.value))} />  
   
-        <Label>Average Call Duration (minutes)</Label>  
-        <Input type="number" value={avgCallDuration} onChange={(e) => setAvgCallDuration(Number(e.target.value))} />  
+      <Label>Average Call Duration (minutes)</Label>  
+      <Input type="number" value={avgCallDuration} onChange={(e) => setAvgCallDuration(Number(e.target.value))} />  
   
-        <Label>Context Tokens</Label>  
-        <Input type="number" value={contextTokens} onChange={(e) => setContextTokens(Number(e.target.value))} />  
+      <Label>Context Tokens</Label>  
+      <Input type="number" value={contextTokens} onChange={(e) => setContextTokens(Number(e.target.value))} />  
   
-      </div>  
-      <div>  
-        <SectionTitle>Distribution Settings</SectionTitle>  
+      <SectionTitle>Distribution Settings</SectionTitle>  
   
-        <Label>Call Volume Pattern</Label>  
-        <Select value={callDistributionPattern} onChange={(e) => setCallDistributionPattern(e.target.value)}>  
-          {Object.entries(callDistributionPatterns).map(([key, value]) => (  
-            <option key={key} value={key}>{value}</option>  
-          ))}  
-        </Select>  
+      <Label>Call Volume Pattern</Label>  
+      <Select value={callDistributionPattern} onChange={(e) => setCallDistributionPattern(e.target.value)}>  
+        {Object.entries(callDistributionPatterns).map(([key, value]) => (  
+          <option key={key} value={key}>{value}</option>  
+        ))}  
+      </Select>  
   
-        <SliderContainer>  
-          <Label>Peak Call Volume Multiplier: {callPeakFactor.toFixed(1)}x</Label>  
-          <Slider min={1} max={5} step={0.1} value={callPeakFactor} onChange={(e) => setCallPeakFactor(Number(e.target.value))} />  
-        </SliderContainer>  
+      <SliderContainer>  
+        <Label>Peak Call Volume Multiplier: {callPeakFactor.toFixed(1)}x</Label>  
+        <Slider min={1} max={5} step={0.1} value={callPeakFactor} onChange={(e) => setCallPeakFactor(Number(e.target.value))} />  
+      </SliderContainer>  
   
-        <SliderContainer>  
-          <Label>Call Volume Time Shift: {callSkew.toFixed(1)} hours</Label>  
-          <Slider min={-12} max={12} step={0.1} value={callSkew} onChange={(e) => setCallSkew(Number(e.target.value))} />  
-        </SliderContainer>  
+      <SliderContainer>  
+        <Label>Call Volume Time Shift: {callSkew.toFixed(1)} hours</Label>  
+        <Slider min={-12} max={12} step={0.1} value={callSkew} onChange={(e) => setCallSkew(Number(e.target.value))} />  
+      </SliderContainer>  
   
-        <Label>Call Duration Variation Pattern</Label>  
-        <Select value={durationDistributionPattern} onChange={(e) => setDurationDistributionPattern(e.target.value)}>  
-          {Object.entries(durationDistributionPatterns).map(([key, value]) => (  
-            <option key={key} value={key}>{value}</option>  
-          ))}  
-        </Select>  
+      <Label>Call Duration Variation Pattern</Label>  
+      <Select value={durationDistributionPattern} onChange={(e) => setDurationDistributionPattern(e.target.value)}>  
+        {Object.entries(durationDistributionPatterns).map(([key, value]) => (  
+          <option key={key} value={key}>{value}</option>  
+        ))}  
+      </Select>  
   
-        <SliderContainer>  
-          <Label>Peak Duration Multiplier: {durationPeakFactor.toFixed(1)}x</Label>  
-          <Slider min={1} max={5} step={0.1} value={durationPeakFactor} onChange={(e) => setDurationPeakFactor(Number(e.target.value))} />  
-        </SliderContainer>  
+      <SliderContainer>  
+        <Label>Peak Duration Multiplier: {durationPeakFactor.toFixed(1)}x</Label>  
+        <Slider min={1} max={5} step={0.1} value={durationPeakFactor} onChange={(e) => setDurationPeakFactor(Number(e.target.value))} />  
+      </SliderContainer>  
   
-        <SliderContainer>  
-          <Label>Duration Time Shift: {durationSkew.toFixed(1)} hours</Label>  
-          <Slider min={-12} max={12} step={0.1} value={durationSkew} onChange={(e) => setDurationSkew(Number(e.target.value))} />  
-        </SliderContainer>  
+      <SliderContainer>  
+        <Label>Duration Time Shift: {durationSkew.toFixed(1)} hours</Label>  
+        <Slider min={-12} max={12} step={0.1} value={durationSkew} onChange={(e) => setDurationSkew(Number(e.target.value))} />  
+      </SliderContainer>  
   
-        <SectionTitle>Task Settings</SectionTitle>  
+      <SectionTitle>Task Settings</SectionTitle>  
   
-        <Label>Task Type</Label>  
-        <Select value={selectedTask} onChange={(e) => setSelectedTask(e.target.value)}>  
-          {Object.entries(taskTypes).map(([key, value]) => (  
-            <option key={key} value={key}>{value}</option>  
-          ))}  
-        </Select>  
+      <Label>Task Type</Label>  
+      <Select value={selectedTask} onChange={(e) => setSelectedTask(e.target.value)}>  
+        {Object.entries(taskTypes).map(([key, value]) => (  
+          <option key={key} value={key}>{value}</option>  
+        ))}  
+      </Select>  
   
-        {selectedTask === 'realTimeSentiment' && (  
-          <div>  
-            <Label>Real-time Interval (minutes)</Label>  
-            <Input type="number" value={realTimeInterval} onChange={(e) => setRealTimeInterval(Number(e.target.value))} />  
-          </div>  
-        )}  
-      </div>  
-    </Grid>  
+      {selectedTask === 'realTimeSentiment' && (  
+        <div>  
+          <Label>Real-time Interval (minutes)</Label>  
+          <Input type="number" value={realTimeInterval} onChange={(e) => setRealTimeInterval(Number(e.target.value))} />  
+        </div>  
+      )}  
+    </div>  
   </Card>  
 );  
   
 /* CostSummary Component */  
-const CostSummary = ({ costs }) => (  
+const CostSummary = ({ costs, selectedModel, selectedSpeechModel }) => (  
   <Card>  
     <CardTitle>Cost Summary</CardTitle>  
-    <CostDisplay>  
-      <CostItem>  
-        <CostLabel>Daily Cost</CostLabel>  
-        <CostValue>${costs.daily.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</CostValue>  
-      </CostItem>  
-      <CostItem>  
-        <CostLabel>Monthly Cost</CostLabel>  
-        <CostValue>${costs.monthly.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</CostValue>  
-      </CostItem>  
-      <CostItem>  
-        <CostLabel>Yearly Cost</CostLabel>  
-        <CostValue>${costs.yearly.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</CostValue>  
-      </CostItem>  
-    </CostDisplay>  
-    <CostDisplay>  
-      <CostItem>  
-        <CostLabel>Total Daily Tokens</CostLabel>  
-        <CostValue>{costs.totalTokens.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</CostValue>  
-      </CostItem>  
+  
+    {/* Tokens Calculation */}  
+    <CostDisplay style={{ alignItems: 'center' }}>  
       <CostItem>  
         <CostLabel>Input Tokens</CostLabel>  
-        <CostValue>{costs.inputTokens.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</CostValue>  
+        <CostValue>  
+          {costs.inputTokens.toLocaleString(undefined, { minimumFractionDigits: 0 })}  
+        </CostValue>  
       </CostItem>  
+  
+      <FaPlus size={32} color="#7f8c8d" />  
+  
       <CostItem>  
         <CostLabel>Output Tokens</CostLabel>  
-        <CostValue>{costs.outputTokens.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</CostValue>  
+        <CostValue>  
+          {costs.outputTokens.toLocaleString(undefined, { minimumFractionDigits: 0 })}  
+        </CostValue>  
+      </CostItem>  
+  
+      <FaEquals size={32} color="#7f8c8d" />  
+  
+      <CostItem>  
+        <CostLabel>Total Daily Tokens</CostLabel>  
+        <CostValue>  
+          {costs.totalTokens.toLocaleString(undefined, { minimumFractionDigits: 0 })}  
+        </CostValue>  
+      </CostItem>  
+    </CostDisplay>  
+  
+    {/* Cost Calculations */}  
+    <CostDisplay style={{ alignItems: 'center' }}>  
+      <CostItem>  
+        <CostLabel>Model Input Cost</CostLabel>  
+        <CostValue>  
+          ${costs.modelInputCost.toFixed(2)}  
+        </CostValue>  
+        <CostLabel>  
+          ({costs.inputTokens.toLocaleString()} tokens x ${selectedModel.input} / 1,000,000)  
+        </CostLabel>  
+      </CostItem>  
+  
+      <FaPlus size={32} color="#7f8c8d" />  
+  
+      <CostItem>  
+        <CostLabel>Model Output Cost</CostLabel>  
+        <CostValue>  
+          ${costs.modelOutputCost.toFixed(2)}  
+        </CostValue>  
+        <CostLabel>  
+          ({costs.outputTokens.toLocaleString()} tokens x ${selectedModel.output} / 1,000,000)  
+        </CostLabel>  
+      </CostItem>  
+  
+      {costs.speechCost > 0 && (  
+        <>  
+          <FaPlus size={32} color="#7f8c8d" />  
+          <CostItem>  
+            <CostLabel>Speech Cost</CostLabel>  
+            <CostValue>  
+              ${costs.speechCost.toFixed(2)}  
+            </CostValue>  
+            <CostLabel>  
+              (Calculated based on speech model)  
+            </CostLabel>  
+          </CostItem>  
+        </>  
+      )}  
+  
+      <FaEquals size={32} color="#7f8c8d" />  
+  
+      <CostItem>  
+        <CostLabel>Total Daily Cost</CostLabel>  
+        <CostValue>  
+          ${costs.daily.toFixed(2)}  
+        </CostValue>  
+        <CostLabel>  
+          (Sum of all costs above)  
+        </CostLabel>  
+      </CostItem>  
+    </CostDisplay>  
+  
+    {/* Monthly Cost */}  
+    <CostDisplay style={{ alignItems: 'center' }}>  
+      <CostItem>  
+        <CostLabel>Daily Cost</CostLabel>  
+        <CostValue>${costs.daily.toFixed(2)}</CostValue>  
+      </CostItem>  
+  
+      <FaTimes size={32} color="#7f8c8d" />  
+  
+      <CostItem>  
+        <CostLabel>30 Days</CostLabel>  
+        <CostValue>30</CostValue>  
+      </CostItem>  
+  
+      <FaEquals size={32} color="#7f8c8d" />  
+  
+      <CostItem>  
+        <CostLabel>Monthly Cost</CostLabel>  
+        <CostValue>${costs.monthly.toFixed(2)}</CostValue>  
+      </CostItem>  
+    </CostDisplay>  
+  
+    {/* Yearly Cost */}  
+    <CostDisplay style={{ alignItems: 'center' }}>  
+      <CostItem>  
+        <CostLabel>Daily Cost</CostLabel>  
+        <CostValue>${costs.daily.toFixed(2)}</CostValue>  
+      </CostItem>  
+  
+      <FaTimes size={32} color="#7f8c8d" />  
+  
+      <CostItem>  
+        <CostLabel>365 Days</CostLabel>  
+        <CostValue>365</CostValue>  
+      </CostItem>  
+  
+      <FaEquals size={32} color="#7f8c8d" />  
+  
+      <CostItem>  
+        <CostLabel>Yearly Cost</CostLabel>  
+        <CostValue>${costs.yearly.toFixed(2)}</CostValue>  
       </CostItem>  
     </CostDisplay>  
   </Card>  
@@ -371,7 +478,7 @@ const Visualizations = ({ chartData }) => (
     <CardTitle>Visualizations</CardTitle>  
     <ChartContainer>  
       <Label>Hourly Call and Duration Distribution</Label>  
-      <ResponsiveContainer width="100%" height={400}>  
+      <ResponsiveContainer width="100%" height="100%">  
         <ComposedChart data={chartData}>  
           <XAxis dataKey="hour" />  
           <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />  
@@ -460,7 +567,7 @@ Total Daily Cost = $${modelInputCost.toFixed(2)} + $${modelOutputCost.toFixed(2)
 );  
   
 /* Main Component */  
-const CallCenterSimulator = () => {  
+const CallCenterCostEstimator = () => {  
   // State variables  
   const [selectedModel, setSelectedModel] = useState(models[0]);  
   const [selectedSpeechModel, setSelectedSpeechModel] = useState(speechModels[0]);  
@@ -486,27 +593,27 @@ const CallCenterSimulator = () => {
     if (pattern !== 'uniform') {  
       switch (pattern) {  
         case 'normalBusiness':  
-          distribution = distribution.map((value, hour) =>   
+          distribution = distribution.map((value, hour) =>  
             hour >= 9 && hour < 17 ? value * peakFactor : value / peakFactor);  
           break;  
         case 'nightShift':  
-          distribution = distribution.map((value, hour) =>   
+          distribution = distribution.map((value, hour) =>  
             hour >= 22 || hour < 6 ? value * peakFactor : value / peakFactor);  
           break;  
         case 'heavyMorning':  
-          distribution = distribution.map((value, hour) =>   
+          distribution = distribution.map((value, hour) =>  
             hour >= 6 && hour < 12 ? value * peakFactor : value / peakFactor);  
           break;  
         case 'heavyEvening':  
-          distribution = distribution.map((value, hour) =>   
+          distribution = distribution.map((value, hour) =>  
             hour >= 17 && hour < 23 ? value * peakFactor : value / peakFactor);  
           break;  
         case 'shorterPeak':  
-          distribution = distribution.map((value, hour) =>   
+          distribution = distribution.map((value, hour) =>  
             (hour >= 9 && hour < 17) ? value / peakFactor : value * peakFactor);  
           break;  
         case 'longerPeak':  
-          distribution = distribution.map((value, hour) =>   
+          distribution = distribution.map((value, hour) =>  
             (hour >= 9 && hour < 17) ? value * peakFactor : value / peakFactor);  
           break;  
         case 'variable':  
@@ -615,38 +722,45 @@ const CallCenterSimulator = () => {
       <GlobalStyle />  
       <Instructions />  
   
-      <InputForm  
-        selectedModel={selectedModel}  
-        setSelectedModel={setSelectedModel}  
-        selectedSpeechModel={selectedSpeechModel}  
-        setSelectedSpeechModel={setSelectedSpeechModel}  
-        totalCalls={totalCalls}  
-        setTotalCalls={setTotalCalls}  
-        avgCallDuration={avgCallDuration}  
-        setAvgCallDuration={setAvgCallDuration}  
-        contextTokens={contextTokens}  
-        setContextTokens={setContextTokens}  
-        callDistributionPattern={callDistributionPattern}  
-        setCallDistributionPattern={setCallDistributionPattern}  
-        callPeakFactor={callPeakFactor}  
-        setCallPeakFactor={setCallPeakFactor}  
-        callSkew={callSkew}  
-        setCallSkew={setCallSkew}  
-        durationDistributionPattern={durationDistributionPattern}  
-        setDurationDistributionPattern={setDurationDistributionPattern}  
-        durationPeakFactor={durationPeakFactor}  
-        setDurationPeakFactor={setDurationPeakFactor}  
-        durationSkew={durationSkew}  
-        setDurationSkew={setDurationSkew}  
-        selectedTask={selectedTask}  
-        setSelectedTask={setSelectedTask}  
-        realTimeInterval={realTimeInterval}  
-        setRealTimeInterval={setRealTimeInterval}  
-      />  
+      <Headline>  
+        <CostSummary costs={costs} selectedModel={selectedModel} selectedSpeechModel={selectedSpeechModel} />  
+      </Headline>  
   
-      <CostSummary costs={costs} />  
-  
-      <Visualizations chartData={chartData} />  
+      <MainContent>  
+        <Column>  
+          <InputForm  
+            selectedModel={selectedModel}  
+            setSelectedModel={setSelectedModel}  
+            selectedSpeechModel={selectedSpeechModel}  
+            setSelectedSpeechModel={setSelectedSpeechModel}  
+            totalCalls={totalCalls}  
+            setTotalCalls={setTotalCalls}  
+            avgCallDuration={avgCallDuration}  
+            setAvgCallDuration={setAvgCallDuration}  
+            contextTokens={contextTokens}  
+            setContextTokens={setContextTokens}  
+            callDistributionPattern={callDistributionPattern}  
+            setCallDistributionPattern={setCallDistributionPattern}  
+            callPeakFactor={callPeakFactor}  
+            setCallPeakFactor={setCallPeakFactor}  
+            callSkew={callSkew}  
+            setCallSkew={setCallSkew}  
+            durationDistributionPattern={durationDistributionPattern}  
+            setDurationDistributionPattern={setDurationDistributionPattern}  
+            durationPeakFactor={durationPeakFactor}  
+            setDurationPeakFactor={setDurationPeakFactor}  
+            durationSkew={durationSkew}  
+            setDurationSkew={setDurationSkew}  
+            selectedTask={selectedTask}  
+            setSelectedTask={setSelectedTask}  
+            realTimeInterval={realTimeInterval}  
+            setRealTimeInterval={setRealTimeInterval}  
+          />  
+        </Column>  
+        <Column>  
+          <Visualizations chartData={chartData} />  
+        </Column>  
+      </MainContent>  
   
       <CalculationExplanations  
         avgCallDuration={avgCallDuration}  
@@ -664,8 +778,9 @@ const CallCenterSimulator = () => {
         selectedModel={selectedModel}  
         selectedSpeechModel={selectedSpeechModel}  
       />  
+  
     </AppContainer>  
   );  
 };  
   
-export default CallCenterSimulator;  
+export default CallCenterCostEstimator;  
