@@ -1,4 +1,5 @@
 # Call Center Sizing and Cost Simulator
+[![Azure Static Web Apps CI/CD](https://github.com/setuc/call-center-sizing/actions/workflows/azure-static-web-apps-gentle-cliff-024927900.yml/badge.svg)](https://github.com/setuc/call-center-sizing/actions/workflows/azure-static-web-apps-gentle-cliff-024927900.yml)
 
 The Call Center sizing and cost simulator is an interactive web application designed to model and predict the costs and performance of various AI and speech recognition models in handling call center operations. Users can configure a multitude of parameters to see how different setups can affect call center efficiency and economics.
 
