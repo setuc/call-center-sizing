@@ -1,20 +1,19 @@
-Certainly! Below is a comprehensive README guide for the Call Center Simulator project based on the provided code. This guide aims to facilitate understanding and ease of use of the application.
+# Call Center Sizing and Cost Simulator
 
----
+The Call Center sizing and cost simulator is an interactive web application designed to model and predict the costs and performance of various AI and speech recognition models in handling call center operations. Users can configure a multitude of parameters to see how different setups can affect call center efficiency and economics.
 
-# Call Center Simulator
-
-The Call Center Simulator is an interactive web application designed to model and predict the costs and performance of various AI and speech recognition models in handling call center operations. It allows users to configure a multitude of parameters to see how different setups can affect call center efficiency and economics.
+App Link: https://gentle-cliff-024927900.5.azurestaticapps.net/
 
 ## Features
 
 - **AI Model Selection:** Choose from several AI models for call handling, each with different input and output token costs.
-- **Speech Model Selection:** Integrate different speech recognition models into the simulation.
-- **Call and Duration Patterns:** Customize how call volume and duration vary throughout the day.
+- **Speech Recognition Model Selection:** Integrate different speech recognition models into the simulation.
+- **Customizable Call and Duration Patterns:** Tailor how call volume and durations vary throughout the day.
 - **Cost Analysis:** Get detailed breakdowns of daily, monthly, and yearly costs based on your settings.
-- **Visualization:** View dynamic charts that represent call handling and token distribution by the hour.
+- **Dynamic Visualizations:** View charts that represent hourly call handling and token distribution.
 - **Task Analysis:** Select different types of AI tasks to run on the calls, including real-time sentiment analysis.
-  
+- **Configuration of Real-Time Settings:** Set the frequency of real-time analysis executions during calls.
+
 ## How to Use
 
 Follow these instructions to simulate your call center environment and analyze the costs:
@@ -26,14 +25,14 @@ Follow these instructions to simulate your call center environment and analyze t
 2. **Enter Call Details:**
    - Specify the total number of daily calls.
    - Set the average call duration in minutes.
-   - Input the context tokens, which is additional data added to each call.
+   - Input the context tokens, which represents additional data added to each call.
 
 3. **Configure Call and Duration Patterns:**
    - Choose a call volume pattern to see how your call volume changes over the day (e.g., Peak During Business Hours).
    - Set the peak call volume multiplier to simulate busy periods.
    - Adjust the time shift to simulate when these busy periods occur.
 
-4. **Set Additional Task Settings:**
+4. **Set Additional Task and Analysis Settings:**
    - Select a task type (e.g., Sentiment Analysis) and configure any task-specific settings like real-time intervals.
 
 5. **Review Results:**
@@ -54,34 +53,36 @@ Follow these instructions to simulate your call center environment and analyze t
   - GPT-4o-mini Regional API
 
 - **Speech Models:**
-  - Whisper (no additional cost)
-  - TTS (Text to Speech)
-  - TTS HD
+  - Whisper TTS (Text to Speech)
+  - Whisper TTS HD
+  - Azure STT - Standard
+  - Azure STT - Custom
 
 ### Task Types
 
-- **Call Summarization:** Generates a summary of the call.
+- **Call Summarization:** Generates a concise summary of the call.
 - **Sentiment Analysis:** Analyzes the sentiment of the call.
 - **Real-time Sentiment Analysis:** Evaluates sentiment at set intervals during the call.
-- **Complex Analysis:** Combines summarization with detailed sentiment analysis.
+- **Complex Analysis:** Combines summarization with comprehensive sentiment analysis.
 
 ### Cost Calculations
 
-- **Token Calculation:** Based on average call duration, word count, and contextual data per call.
+- **Token Calculation:** Based on average call duration, word count, contextual data, and selected task type per call.
 - **Model Input/Output Cost:** Calculated using token prices specified by selected AI models.
 - **Speech Cost:** Factored by using model-specific pricing and duration of calls.
 
 ### Visualizations
 
 The simulator provides two key charts:
-- **Hourly Call and Duration Distribution:** Shows call volume and average duration by hour.
-- **Hourly Token Distribution:** Displays the distribution between input and output tokens hourly.
+- **Hourly Call and Duration Distribution:** Displays call volume and average duration by hour.
+- **Hourly Speech to Text Usage or Token Distribution:** Shows STT hours or input/output token distribution by hour depending on the selected speech model.
 
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for more information.
 
 ## Contributing
+
 Your contributions are welcome! If you'd like to contribute to this project, please follow the guidelines below:
 
 1. **Fork the Repository:**
