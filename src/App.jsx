@@ -367,7 +367,7 @@ const InputForm = ({
 
 /* CostSummary Component */
 const CostSummary = ({ costs, selectedModel, selectedSpeechModel }) => {
-  const formatNumber = (num) => num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const formatNumber = (num) => num.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
   return (
     <Card>
