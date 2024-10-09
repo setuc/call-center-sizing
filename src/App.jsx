@@ -4,29 +4,37 @@ import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, Legend,    
   ResponsiveContainer, ComposedChart,    
 } from 'recharts';    
+import { FaRobot, FaPhone, FaChartLine, FaCog, FaInfoCircle } from 'react-icons/fa';  
+
   
 /* Global Styles */  
-const GlobalStyle = createGlobalStyle`  
-  body {  
-    background-color: #f0f4f8;  
-    margin: 0;  
-    padding: 0;  
+const GlobalStyle = createGlobalStyle`    
+  *, *::before, *::after {  
+    box-sizing: border-box;    
   }  
-`;  
+  
+  body {    
+    background-color: #f0f4f8;    
+    margin: 0;    
+    padding: 0;    
+  }    
+`; 
   
 /* Styled Components */  
 const AppContainer = styled.div`    
   font-family: Arial, sans-serif;    
-  max-width: 1500px;    
+  width: 100%;    
+  max-width: 1200px;    
   margin: 0 auto;    
-  padding: 20px;    
+  padding: 0 5%;              
   background-color: #f0f4f8;    
   color: #333;    
   min-height: 100vh;    
   display: flex;    
   flex-direction: column;    
-  align-items: center;   
-`;  
+  align-items: center;
+  justify-content: center; 
+`;   
   
 const Card = styled.div`  
   background-color: white;  
@@ -35,7 +43,7 @@ const Card = styled.div`
   margin-bottom: 20px;  
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);  
   max-width: 800px; 
-  width: 100%;   
+  width: 100%;
 `;   
   
 const CardTitle = styled.h2`  
@@ -178,21 +186,39 @@ const taskTypes = {
 };  
   
 /* Instructions Component */  
-const Instructions = () => (    
-  <InstructionsBox>    
-    <h3>How to Use This Advanced Call Center Simulator:</h3>    
-    <ol>    
-      <li>Select the GPT model and speech model you want to simulate.</li>    
-      <li>Enter the total number of daily calls and average call duration.</li>    
-      <li>Choose the call volume pattern and call duration variation pattern.</li>    
-      <li>Adjust peak multipliers and time shifts to simulate different scenarios.</li>    
-      <li>Set the number of context tokens for each call.</li>    
-      <li>Select the type of analysis task.</li>    
-      <li>For real-time analysis, set the interval (in minutes).</li>    
-      <li>View the visualizations and cost summary to see how your settings affect the simulation.</li>    
-    </ol>    
-  </InstructionsBox>    
+/* Instructions Component */  
+const Instructions = () => (  
+  <InstructionsBox>  
+    <h3>How to Use the Call Center Simulator:</h3>  
+    <ol>  
+      <li>  
+      <FaRobot /><strong> Select AI Models:</strong> Choose the AI models for call handling and speech recognition you'd like to simulate.  
+      </li>  
+      <li>  
+      <FaPhone /><strong> Enter Call Details:</strong> Input the total number of calls your center handles each day and the average length of each call.  
+      </li>  
+      <li>  
+      <FaPhone /><strong> Choose Call Patterns:</strong> Select how your call volume and call durations change throughout the day.  
+      </li>  
+      <li>  
+      <FaPhone /><strong> Adjust Peak Times:</strong> Modify settings to simulate busy periods and different customer calling behaviors.  
+      </li>  
+      <li>  
+      <FaPhone /><strong> Set Call Complexity:</strong> Specify any additional information or context you'd like each call to include.  
+      </li>  
+      <li>  
+      <FaCog/> <strong> Select Analysis Type:</strong> Choose the kind of analysis you want the simulator to perform on the calls.  
+      </li>  
+      <li>  
+      <FaInfoCircle /><strong> Configure Real-Time Settings:</strong> If you want real-time analysis, set how frequently you'd like the analysis to run.  
+      </li>  
+      <li>  
+        <FaChartLine /><strong> Review Results:</strong> View the visualizations and cost summary to see how your settings impact the simulation.  
+      </li>  
+    </ol>  
+  </InstructionsBox>  
 );  
+
   
 /* InputForm Component */  
 const InputForm = ({  
