@@ -17,7 +17,7 @@ const GlobalStyle = createGlobalStyle`
 /* Styled Components */  
 const AppContainer = styled.div`    
   font-family: Arial, sans-serif;    
-  max-width: 1200px;    
+  max-width: 1500px;    
   margin: 0 auto;    
   padding: 20px;    
   background-color: #f0f4f8;    
@@ -25,6 +25,7 @@ const AppContainer = styled.div`
   min-height: 100vh;    
   display: flex;    
   flex-direction: column;    
+  align-items: center;   
 `;  
   
 const Card = styled.div`  
@@ -33,7 +34,9 @@ const Card = styled.div`
   padding: 20px;  
   margin-bottom: 20px;  
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);  
-`;  
+  max-width: 800px; 
+  width: 100%;   
+`;   
   
 const CardTitle = styled.h2`  
   font-size: 24px;  
