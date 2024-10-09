@@ -2,83 +2,108 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
 
-const Card = styled.div`
-  width: 1000px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+const AppContainer = styled.div`
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
-  margin: 20px auto;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: #f0f4f8;
+  color: #333;
 `;
 
-const CardHeader = styled.div`
+const Card = styled.div`
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 `;
 
 const CardTitle = styled.h2`
   font-size: 24px;
-  margin: 0;
-`;
-
-const CardContent = styled.div``;
-
-const Label = styled.label`
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const SliderContainer = styled.div`
-  margin-bottom: 10px;
-`;
-
-const Slider = styled.input.attrs({ type: 'range' })`
-  width: 100%;
-`;
-
-const TabContainer = styled.div`
   margin-bottom: 20px;
-`;
-
-const TabButton = styled.button`
-  padding: 10px 20px;
-  border: none;
-  background-color: ${props => props.active ? '#ddd' : '#f0f0f0'};
-  cursor: pointer;
-  &:first-child {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-  }
-  &:last-child {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-  }
-`;
-
-const TabContent = styled.div`
-  display: ${props => props.active ? 'block' : 'none'};
+  color: #2c3e50;
 `;
 
 const Grid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #34495e;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 16px;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 16px;
+`;
+
+const SliderContainer = styled.div`
+  margin-bottom: 15px;
+`;
+
+const Slider = styled.input.attrs({ type: 'range' })`
+  width: 100%;
+`;
+
+const ChartContainer = styled.div`
+  margin-top: 20px;
+`;
+
+const CostDisplay = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+  text-align: center;
+`;
+
+const CostItem = styled.div`
+  background-color: #ecf0f1;
+  padding: 15px;
+  border-radius: 8px;
+`;
+
+const CostLabel = styled.div`
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+`;
+
+const CostValue = styled.div`
+  font-size: 24px;
+  font-weight: bold;
+  color: #2980b9;
+`;
+
+const Instructions = styled.div`
+  background-color: #e8f4fd;
+  border-left: 5px solid #3498db;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
 `;
 
 const models = [
@@ -121,7 +146,6 @@ const CallCenterSimulator = () => {
   const [durationPeakFactor, setDurationPeakFactor] = useState(1.5);
   const [callSkew, setCallSkew] = useState(0);
   const [durationSkew, setDurationSkew] = useState(0);
-  const [activeTab, setActiveTab] = useState('settings');
 
   const wordsPerMinute = 150;
   const tokensPerWord = 1.5;
@@ -150,7 +174,7 @@ const CallCenterSimulator = () => {
 
     // Apply skew
     const skewedDistribution = distribution.map((value, hour) => {
-      const skewEffect = Math.sin((hour / 24 + skew) * 2 * Math.PI);
+      const skewEffect = Math.sin((hour / 24 + skew / 12) * 2 * Math.PI);
       return value * (1 + skewEffect * 0.5);
     });
 
@@ -188,122 +212,125 @@ const CallCenterSimulator = () => {
   }));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Advanced Call Center Cost Simulator</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <TabContainer>
-          <TabButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')}>Settings</TabButton>
-          <TabButton active={activeTab === 'visualizations'} onClick={() => setActiveTab('visualizations')}>Visualizations</TabButton>
-        </TabContainer>
-        <TabContent active={activeTab === 'settings'}>
-          <Grid>
-            <div>
-              <Label>Model</Label>
-              <Select onChange={(e) => setSelectedModel(models.find(m => m.name === e.target.value))}>
-                {models.map((model) => (
-                  <option key={model.name} value={model.name}>{model.name}</option>
-                ))}
-              </Select>
-              
-              <Label>Speech Model</Label>
-              <Select onChange={(e) => setSelectedSpeechModel(speechModels.find(m => m.name === e.target.value))}>
-                {speechModels.map((model) => (
-                  <option key={model.name} value={model.name}>{model.name}</option>
-                ))}
-              </Select>
-              
-              <Label>Total Daily Calls</Label>
-              <Input type="number" value={totalCalls} onChange={(e) => setTotalCalls(Number(e.target.value))} />
-              
-              <Label>Average Call Duration (minutes)</Label>
-              <Input type="number" value={avgCallDuration} onChange={(e) => setAvgCallDuration(Number(e.target.value))} />
-            </div>
-            <div>
-              <Label>Call Distribution Pattern</Label>
-              <Select onChange={(e) => setCallDistributionPattern(e.target.value)}>
-                {Object.entries(distributionPatterns).map(([key, value]) => (
-                  <option key={key} value={key}>{value}</option>
-                ))}
-              </Select>
-              
-              <SliderContainer>
-                <Label>Call Peak Factor: {callPeakFactor.toFixed(1)}x</Label>
-                <Slider min={1} max={5} step={0.1} value={callPeakFactor} onChange={(e) => setCallPeakFactor(Number(e.target.value))} />
-              </SliderContainer>
-              
-              <SliderContainer>
-                <Label>Call Time Skew: {callSkew.toFixed(1)} hours</Label>
-                <Slider min={-12} max={12} step={0.1} value={callSkew} onChange={(e) => setCallSkew(Number(e.target.value))} />
-              </SliderContainer>
-              
-              <Label>Duration Distribution Pattern</Label>
-              <Select onChange={(e) => setDurationDistributionPattern(e.target.value)}>
-                {Object.entries(durationPatterns).map(([key, value]) => (
-                  <option key={key} value={key}>{value}</option>
-                ))}
-              </Select>
-              
-              <SliderContainer>
-                <Label>Duration Peak Factor: {durationPeakFactor.toFixed(1)}x</Label>
-                <Slider min={1} max={3} step={0.1} value={durationPeakFactor} onChange={(e) => setDurationPeakFactor(Number(e.target.value))} />
-              </SliderContainer>
-              
-              <SliderContainer>
-                <Label>Duration Time Skew: {durationSkew.toFixed(1)} hours</Label>
-                <Slider min={-12} max={12} step={0.1} value={durationSkew} onChange={(e) => setDurationSkew(Number(e.target.value))} />
-              </SliderContainer>
-            </div>
-          </Grid>
-        </TabContent>
-        <TabContent active={activeTab === 'visualizations'}>
+    <AppContainer>
+      <Instructions>
+        <h3>How to Use This Calculator:</h3>
+        <ol>
+          <li>Select the GPT model and speech model you want to simulate.</li>
+          <li>Enter the total number of daily calls and average call duration.</li>
+          <li>Choose distribution patterns for call volume and duration.</li>
+          <li>Adjust peak factors and time skews to fine-tune the distribution.</li>
+          <li>View the visualizations below to see how your settings affect call patterns and costs.</li>
+        </ol>
+      </Instructions>
+
+      <Card>
+        <CardTitle>Call Center Cost Simulator</CardTitle>
+        <Grid>
           <div>
-            <Label>Call and Duration Distribution</Label>
-            <ResponsiveContainer width="100%" height={400}>
-              <ComposedChart data={chartData}>
-                <XAxis dataKey="hour" />
-                <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                <Tooltip />
-                <Legend />
-                <Bar yAxisId="left" dataKey="calls" fill="#8884d8" name="Calls" />
-                <Line yAxisId="right" type="monotone" dataKey="duration" stroke="#82ca9d" name="Avg Duration (min)" />
-              </ComposedChart>
-            </ResponsiveContainer>
+            <Label>Model</Label>
+            <Select onChange={(e) => setSelectedModel(models.find(m => m.name === e.target.value))}>
+              {models.map((model) => (
+                <option key={model.name} value={model.name}>{model.name}</option>
+              ))}
+            </Select>
+            
+            <Label>Speech Model</Label>
+            <Select onChange={(e) => setSelectedSpeechModel(speechModels.find(m => m.name === e.target.value))}>
+              {speechModels.map((model) => (
+                <option key={model.name} value={model.name}>{model.name}</option>
+              ))}
+            </Select>
+            
+            <Label>Total Daily Calls</Label>
+            <Input type="number" value={totalCalls} onChange={(e) => setTotalCalls(Number(e.target.value))} />
+            
+            <Label>Average Call Duration (minutes)</Label>
+            <Input type="number" value={avgCallDuration} onChange={(e) => setAvgCallDuration(Number(e.target.value))} />
           </div>
           <div>
-            <Label>Agents Needed Distribution</Label>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <XAxis dataKey="hour" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="agents" fill="#ffc658" name="Agents Needed" />
-              </BarChart>
-            </ResponsiveContainer>
+            <Label>Call Distribution Pattern</Label>
+            <Select onChange={(e) => setCallDistributionPattern(e.target.value)}>
+              {Object.entries(distributionPatterns).map(([key, value]) => (
+                <option key={key} value={key}>{value}</option>
+              ))}
+            </Select>
+            
+            <SliderContainer>
+              <Label>Call Peak Factor: {callPeakFactor.toFixed(1)}x</Label>
+              <Slider min={1} max={5} step={0.1} value={callPeakFactor} onChange={(e) => setCallPeakFactor(Number(e.target.value))} />
+            </SliderContainer>
+            
+            <SliderContainer>
+              <Label>Call Time Skew: {callSkew.toFixed(1)} hours</Label>
+              <Slider min={-12} max={12} step={0.1} value={callSkew} onChange={(e) => setCallSkew(Number(e.target.value))} />
+            </SliderContainer>
+            
+            <Label>Duration Distribution Pattern</Label>
+            <Select onChange={(e) => setDurationDistributionPattern(e.target.value)}>
+              {Object.entries(durationPatterns).map(([key, value]) => (
+                <option key={key} value={key}>{value}</option>
+              ))}
+            </Select>
+            
+            <SliderContainer>
+              <Label>Duration Peak Factor: {durationPeakFactor.toFixed(1)}x</Label>
+              <Slider min={1} max={3} step={0.1} value={durationPeakFactor} onChange={(e) => setDurationPeakFactor(Number(e.target.value))} />
+            </SliderContainer>
+            
+            <SliderContainer>
+              <Label>Duration Time Skew: {durationSkew.toFixed(1)} hours</Label>
+              <Slider min={-12} max={12} step={0.1} value={durationSkew} onChange={(e) => setDurationSkew(Number(e.target.value))} />
+            </SliderContainer>
           </div>
-          <div>
-            <Label>Estimated Costs</Label>
-            <Grid>
-              <div>
-                <div>Daily</div>
-                <div>${costs.daily}</div>
-              </div>
-              <div>
-                <div>Monthly</div>
-                <div>${costs.monthly}</div>
-              </div>
-              <div>
-                <div>Yearly</div>
-                <div>${costs.yearly}</div>
-              </div>
-            </Grid>
-          </div>
-        </TabContent>
-      </CardContent>
-    </Card>
+        </Grid>
+
+        <CostDisplay>
+          <CostItem>
+            <CostLabel>Daily Cost</CostLabel>
+            <CostValue>${costs.daily}</CostValue>
+          </CostItem>
+          <CostItem>
+            <CostLabel>Monthly Cost</CostLabel>
+            <CostValue>${costs.monthly}</CostValue>
+          </CostItem>
+          <CostItem>
+            <CostLabel>Yearly Cost</CostLabel>
+            <CostValue>${costs.yearly}</CostValue>
+          </CostItem>
+        </CostDisplay>
+      </Card>
+
+      <Card>
+        <CardTitle>Visualizations</CardTitle>
+        <ChartContainer>
+          <Label>Call and Duration Distribution</Label>
+          <ResponsiveContainer width="100%" height={400}>
+            <ComposedChart data={chartData}>
+              <XAxis dataKey="hour" />
+              <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+              <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+              <Tooltip />
+              <Legend />
+              <Bar yAxisId="left" dataKey="calls" fill="#8884d8" name="Calls" />
+              <Line yAxisId="right" type="monotone" dataKey="duration" stroke="#82ca9d" name="Avg Duration (min)" />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+        <ChartContainer>
+          <Label>Agents Needed Distribution</Label>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+              <XAxis dataKey="hour" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="agents" fill="#ffc658" name="Agents Needed" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </Card>
+    </AppContainer>
   );
 };
 
