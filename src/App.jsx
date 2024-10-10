@@ -34,10 +34,26 @@ const CallCenterCostEstimator = () => {
   const durationDistribution = generateDistribution(durationDistributionPattern, durationPeakFactor, durationSkew, avgCallDuration, 'duration');
 
   // Calculate costs
-  const costs = calculateCost(callDistribution, durationDistribution, selectedModel, selectedSpeechModel, wordsPerMinute);
+  const costs = calculateCost(
+    callDistribution,
+    durationDistribution,
+    selectedModel,
+    selectedSpeechModel,
+    wordsPerMinute,
+    selectedTask,
+    contextTokens,
+    realTimeInterval
+  );
 
   // Calculate tokens per call for explanations
-  const tokensPerCall = calculateTokens(avgCallDuration);
+  const tokensPerCall = calculateTokens(
+    avgCallDuration,
+    selectedTask,
+    contextTokens,
+    realTimeInterval,
+    wordsPerMinute,
+    tokensPerWord
+  );
 
   // Prepare data for charts
   const chartData = callDistribution.map((calls, hour) => {
