@@ -622,14 +622,51 @@ const CalculationExplanations = ({
   selectedModel,
   selectedSpeechModel,
   totalHours,
-}) => (
-  <ExplanationBox>
-    <h3>Calculation Explanations</h3>
-    {selectedSpeechModel.type === 'azure' ? (
-      <>
-        <p><strong>Azure Speech to Text Cost Calculation:</strong></p>
-        <pre>
-          {`Total Calls: ${totalCalls.toLocaleString()}
+  callDistribution,
+  durationDistribution,
+  callDistributionPattern,
+  durationDistributionPattern,
+  callPeakFactor,
+  durationPeakFactor,
+  callSkew,
+  durationSkew,
+  hourlyBreakdown
+}) => {
+  const formatNumber = (num) => num.toLocaleString(undefined, {maximumFractionDigits: 2});
+
+  const calculateHourlyBreakdown = () => {
+    let breakdown = '';
+    let totalCalculatedHours = 0;
+
+    hourlyBreakdown.forEach(({ hour, calls, duration, hours }) => {
+      totalCalculatedHours += hours;
+      breakdown += `Hour ${hour}: ${formatNumber(calls)} calls * ${formatNumber(duration)} minutes = ${formatNumber(hours)} hours\n`;
+    });
+
+    breakdown += `\nTotal Calculated Hours: ${formatNumber(totalCalculatedHours)}`;
+    return breakdown;
+  };
+
+  return (
+    <ExplanationBox>
+      <h3>Calculation Explanations</h3>
+      
+      <p><strong>Hourly Breakdown:</strong></p>
+      <pre>
+        {calculateHourlyBreakdown()}
+      </pre>
+
+      <p><strong>Distribution Patterns:</strong></p>
+      <pre>
+        {`Call Distribution: ${callDistributionPattern} (Peak Factor: ${callPeakFactor}, Skew: ${callSkew})
+Duration Distribution: ${durationDistributionPattern} (Peak Factor: ${durationPeakFactor}, Skew: ${durationSkew})`}
+      </pre>
+
+      {selectedSpeechModel.type === 'azure' ? (
+        <>
+          <p><strong>Azure Speech to Text Cost Calculation:</strong></p>
+          <pre>
+            {`Total Calls: ${totalCalls.toLocaleString()}
 Average Call Duration: ${avgCallDuration} minutes
 Total Minutes: ${totalCalls} * ${avgCallDuration} = ${(totalCalls * avgCallDuration).toLocaleString()} minutes
 Total Hours Used: ${(totalCalls * avgCallDuration).toLocaleString()} / 60 = ${totalHours.toFixed(2)} hours
@@ -639,32 +676,34 @@ Base Price: $${selectedSpeechModel.tiers.find(tier => totalHours <= tier.hours)?
 Overage Hours: ${Math.max(0, totalHours - (selectedSpeechModel.tiers.find(tier => totalHours <= tier.hours)?.hours || selectedSpeechModel.tiers[selectedSpeechModel.tiers.length - 1].hours)).toFixed(2)}
 Overage Rate: $${selectedSpeechModel.tiers.find(tier => totalHours <= tier.hours)?.overage || selectedSpeechModel.tiers[selectedSpeechModel.tiers.length - 1].overage} per hour
 Total Speech to Text Cost: $${speechCost.toFixed(2)}`}
-        </pre>
-      </>
-    ) : (
-      <>
-        <p><strong>Token Calculation per Call:</strong></p>
-        <pre>
-          {`Input Tokens = (Call Duration (${avgCallDuration} min) * Words per Minute (${wordsPerMinute}) * Tokens per Word (${tokensPerWord})) + Context Tokens (${contextTokens})
+          </pre>
+        </>
+      ) : (
+        <>
+          <p><strong>Token Calculation per Call:</strong></p>
+          <pre>
+            {`Input Tokens = (Call Duration (${avgCallDuration} min) * Words per Minute (${wordsPerMinute}) * Tokens per Word (${tokensPerWord})) + Context Tokens (${contextTokens})
 Input Tokens = (${avgCallDuration} * ${wordsPerMinute} * ${tokensPerWord}) + ${contextTokens}
 Input Tokens = ${((avgCallDuration * wordsPerMinute * tokensPerWord) + contextTokens).toLocaleString(undefined, {maximumFractionDigits: 0})}
 
 Output Tokens = Calculated based on task type (see below)
 Total Tokens per Call = Input Tokens + Output Tokens`}
-        </pre>
-      </>
-    )}
-    <p><strong>Total Tokens for All Calls:</strong></p>
-    <pre>
-      {`Total Input Tokens = Input Tokens per Call * Total Calls
+          </pre>
+        </>
+      )}
+
+      <p><strong>Total Tokens for All Calls:</strong></p>
+      <pre>
+        {`Total Input Tokens = Input Tokens per Call * Total Calls
 Total Input Tokens = ${tokensPerCall.input.toLocaleString()} * ${totalCalls.toLocaleString()} = ${totalInputTokens.toLocaleString()}
 
 Total Output Tokens = Output Tokens per Call * Total Calls
 Total Output Tokens = ${tokensPerCall.output.toLocaleString()} * ${totalCalls.toLocaleString()} = ${totalOutputTokens.toLocaleString()}`}
-    </pre>
-    <p><strong>Cost Calculation:</strong></p>
-    <pre>
-      {`Model Input Cost = (Total Input Tokens * Model Input Price) / 1,000,000
+      </pre>
+
+      <p><strong>Cost Calculation:</strong></p>
+      <pre>
+        {`Model Input Cost = (Total Input Tokens * Model Input Price) / 1,000,000
 Model Input Cost = (${totalInputTokens.toLocaleString()} * $${selectedModel.input}) / 1,000,000 = $${modelInputCost.toFixed(2)}
 
 Model Output Cost = (Total Output Tokens * Model Output Price) / 1,000,000
@@ -677,16 +716,18 @@ Speech Cost = (${totalCalls.toLocaleString()} * ${avgCallDuration} * ${wordsPerM
 
 Total Daily Cost = Model Input Cost + Model Output Cost + Speech Cost
 Total Daily Cost = $${modelInputCost.toFixed(2)} + $${modelOutputCost.toFixed(2)} + $${speechCost.toFixed(2)} = $${dailyCost.toFixed(2)}`}
-    </pre>
-    <p><strong>Task Type Explanations:</strong></p>
-    <ul>
-      <li><strong>Call Summarization:</strong> Output tokens are 20% of input tokens, simulating a concise summary.</li>
-      <li><strong>Sentiment Analysis:</strong> Fixed output of 50 tokens per call, representing a brief sentiment score and explanation.</li>
-      <li><strong>Real-time Sentiment Analysis:</strong> 50 tokens per interval during the call, allowing for sentiment tracking over time.</li>
-      <li><strong>Complex Analysis:</strong> Output tokens are 30% of input tokens, accounting for both summary and detailed sentiment analysis.</li>
-    </ul>
-  </ExplanationBox>
-);
+      </pre>
+
+      <p><strong>Task Type Explanations:</strong></p>
+      <ul>
+        <li><strong>Call Summarization:</strong> Output tokens are 20% of input tokens, simulating a concise summary.</li>
+        <li><strong>Sentiment Analysis:</strong> Fixed output of 50 tokens per call, representing a brief sentiment score and explanation.</li>
+        <li><strong>Real-time Sentiment Analysis:</strong> 50 tokens per interval during the call, allowing for sentiment tracking over time.</li>
+        <li><strong>Complex Analysis:</strong> Output tokens are 30% of input tokens, accounting for both summary and detailed sentiment analysis.</li>
+      </ul>
+    </ExplanationBox>
+  );
+};
 
 /* Main Component */
 const CallCenterCostEstimator = () => {
@@ -707,6 +748,35 @@ const CallCenterCostEstimator = () => {
 
   const wordsPerMinute = 150;
   const tokensPerWord = 1.5;
+
+  // Function to calculate tokens based on duration and task type
+  const calculateTokens = (duration) => {
+    const inputTokens = Math.ceil(duration * wordsPerMinute * tokensPerWord);
+    let outputTokens;
+
+    switch (selectedTask) {
+      case 'summarization':
+        outputTokens = Math.ceil(inputTokens * 0.2); // Assume summary is 20% of input
+        break;
+      case 'sentiment':
+        outputTokens = 50; // Fixed output for sentiment
+        break;
+      case 'realTimeSentiment':
+        outputTokens = Math.ceil(duration / realTimeInterval) * 50; // 50 tokens per interval
+        break;
+      case 'complexAnalysis':
+        outputTokens = Math.ceil(inputTokens * 0.3); // 30% for summary + sentiment
+        break;
+      default:
+        outputTokens = Math.ceil(inputTokens * 0.2);
+    }
+
+    return {
+      input: inputTokens + contextTokens,
+      output: outputTokens,
+      total: inputTokens + contextTokens + outputTokens
+    };
+  };
 
   // Function to generate distribution based on pattern
   const generateDistribution = (pattern, peakFactor, skew, baseValue, type = 'calls') => {
@@ -759,52 +829,28 @@ const CallCenterCostEstimator = () => {
     return distribution;
   };
 
-  // Generate call and duration distributions
-  const callDistribution = generateDistribution(callDistributionPattern, callPeakFactor, callSkew, totalCalls / 24, 'calls');
-  const durationDistribution = generateDistribution(durationDistributionPattern, durationPeakFactor, durationSkew, avgCallDuration, 'duration');
-
-  // Function to calculate tokens based on duration and task type
-  const calculateTokens = (duration) => {
-    const inputTokens = Math.ceil(duration * wordsPerMinute * tokensPerWord);
-    let outputTokens;
-
-    switch (selectedTask) {
-      case 'summarization':
-        outputTokens = Math.ceil(inputTokens * 0.2); // Assume summary is 20% of input
-        break;
-      case 'sentiment':
-        outputTokens = 50; // Fixed output for sentiment
-        break;
-      case 'realTimeSentiment':
-        outputTokens = Math.ceil(duration / realTimeInterval) * 50; // 50 tokens per interval
-        break;
-      case 'complexAnalysis':
-        outputTokens = Math.ceil(inputTokens * 0.3); // 30% for summary + sentiment
-        break;
-      default:
-        outputTokens = Math.ceil(inputTokens * 0.2);
-    }
-
-    return {
-      input: inputTokens + contextTokens,
-      output: outputTokens,
-      total: inputTokens + contextTokens + outputTokens
-    };
-  };
-
   // Function to calculate costs
-  const calculateCost = () => {
+  const calculateCost = (callDistribution, durationDistribution, selectedModel, selectedSpeechModel, wordsPerMinute) => {
     let totalInputTokens = 0;
     let totalOutputTokens = 0;
     let totalHours = 0;
     let totalCharacters = 0;
+    let hourlyBreakdown = [];
   
     callDistribution.forEach((calls, hour) => {
       const tokens = calculateTokens(durationDistribution[hour]);
+      const hourlyHours = (calls * durationDistribution[hour]) / 60;
       totalInputTokens += calls * tokens.input;
       totalOutputTokens += calls * tokens.output;
-      totalHours += (calls * durationDistribution[hour]) / 60;
+      totalHours += hourlyHours;
       totalCharacters += calls * durationDistribution[hour] * wordsPerMinute * 5;
+      
+      hourlyBreakdown.push({
+        hour,
+        calls,
+        duration: durationDistribution[hour],
+        hours: hourlyHours
+      });
     });
   
     const modelInputCost = (totalInputTokens * selectedModel.input) / 1000000;
@@ -836,10 +882,19 @@ const CallCenterCostEstimator = () => {
       speechCost,
       totalHours,
       totalCharacters,
+      hourlyBreakdown
     };
   };
 
-  const costs = calculateCost();
+  // Generate call and duration distributions
+  const callDistribution = generateDistribution(callDistributionPattern, callPeakFactor, callSkew, totalCalls / 24, 'calls');
+  const durationDistribution = generateDistribution(durationDistributionPattern, durationPeakFactor, durationSkew, avgCallDuration, 'duration');
+
+  // Calculate costs
+  const costs = calculateCost(callDistribution, durationDistribution, selectedModel, selectedSpeechModel, wordsPerMinute);
+
+  // Calculate tokens per call for explanations
+  const tokensPerCall = calculateTokens(avgCallDuration);
 
   // Prepare data for charts
   const chartData = callDistribution.map((calls, hour) => {
@@ -854,9 +909,6 @@ const CallCenterCostEstimator = () => {
       sttHours: (calls * durationDistribution[hour]) / 60,
     };
   });
-
-  // Calculate tokens per call for explanations
-  const tokensPerCall = calculateTokens(avgCallDuration);
 
   return (
     <AppContainer>
@@ -918,11 +970,20 @@ const CallCenterCostEstimator = () => {
         speechCost={costs.speechCost}
         selectedModel={selectedModel}
         selectedSpeechModel={selectedSpeechModel}
-        totalHours={costs.totalHours}  // Add this line
+        totalHours={costs.totalHours}
+        callDistribution={callDistribution}
+        durationDistribution={durationDistribution}
+        callDistributionPattern={callDistributionPattern}
+        durationDistributionPattern={durationDistributionPattern}
+        callPeakFactor={callPeakFactor}
+        durationPeakFactor={durationPeakFactor}
+        callSkew={callSkew}
+        durationSkew={durationSkew}
+        hourlyBreakdown={costs.hourlyBreakdown}
       /> 
   
     </AppContainer>  
   );  
 };  
   
-export default CallCenterCostEstimator;  
+export default CallCenterCostEstimator;
